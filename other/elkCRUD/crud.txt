@@ -1,0 +1,59 @@
+ your_indexes  => your indexes name
+# your_doc     => your doc name on indexes
+
+# Create new indexes template
+PUT your_indexes
+{
+  "mappings": {
+    "your_doc": {
+      "properties": {
+        "username": {
+          "type": "keyword"
+        },
+        "display_name": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+
+# Get type on indexes
+GET your_indexes
+
+# Create new data to indexes
+PUT your_indexes/your_doc/1
+{
+    "username" : "userA",
+    "display_name" : "User A"
+}
+PUT your_indexes/your_doc/2
+{
+    "username" : "userB",
+    "display_name" : "User B"
+}
+PUT your_indexes/your_doc/3
+{
+    "username" : "userC",
+    "display_name" : "User C"
+}
+
+# Get all on indexes
+GET your_indexes/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+# Update data on indexes
+POST /your_indexes/your_doc/1/_update
+{
+  "script" : "ctx._source.display_name = 'AAAAA'"
+}
+
+# Delete document
+DELETE /your_indexes/your_doc/1
+
+# Delete indexes
+DELETE /your_indexes
