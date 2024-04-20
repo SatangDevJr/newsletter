@@ -30,7 +30,7 @@ func callRepoGetAllSubscribers() *mock.Call {
 }
 
 func callRepoFindByEmail() *mock.Call {
-	return repository.On("FindByEmail")
+	return repository.On("FindByEmail", mock.Anything)
 }
 
 func beforeEach() {
@@ -111,6 +111,68 @@ func TestService_GetAllSubscribers(t *testing.T) {
 		mockRepoGetAllSubscribers.Return(mockSubscribers, nil)
 
 		res, err := service.GetAllSubscribers()
+
+		assert.Equal(t, mockSubscribers, res)
+		assert.Nil(t, err)
+	})
+
+}
+
+func TestService_FindByEmail(t *testing.T) {
+	beforeEachFindByEmail := func() {
+		beforeEach()
+
+		mockRepoFindByEmail = mocker.NewMockCall(callRepoFindByEmail)
+		mockRepoFindByEmail.Return(nil, nil)
+	}
+
+	t.Run("should call repository find by email when call service find by email", func(t *testing.T) {
+		beforeEachFindByEmail()
+
+		email := "ajistestmail@gmail.com"
+
+		service.FindByEmail(email)
+
+		repository.AssertCalled(t, "FindByEmail", email)
+	})
+
+	t.Run("should response internal server error when repository find by email failed", func(t *testing.T) {
+		beforeEachFindByEmail()
+		mockRepoFindByEmail.Return(nil, errors.New("Error"))
+
+		email := "ajistestmail@gmail.com"
+		res, err := service.FindByEmail(email)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		assert.Equal(t, expectedError, err)
+		assert.Nil(t, res)
+	})
+
+	t.Run("should return data not found when data not founded", func(t *testing.T) {
+		beforeEachFindByEmail()
+		mockRepoFindByEmail.Return(nil, nil)
+
+		email := "ajistestmail@gmail.com"
+		res, err := service.FindByEmail(email)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
+		assert.Nil(t, res)
+		assert.Equal(t, expectedError, err)
+	})
+
+	t.Run("should return data when found data", func(t *testing.T) {
+		beforeEachFindByEmail()
+		mockSubscribers := []entity.Subscribers{
+			{
+				ID:    1,
+				Name:  "TEST",
+				Email: "ajistestmail@gmail.com",
+			},
+		}
+		mockRepoFindByEmail.Return(mockSubscribers, nil)
+
+		email := "ajistestmail@gmail.com"
+		res, err := service.FindByEmail(email)
 
 		assert.Equal(t, mockSubscribers, res)
 		assert.Nil(t, err)
