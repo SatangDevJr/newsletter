@@ -16,6 +16,8 @@ import (
 type Repository interface {
 	GetAllSubscribers() ([]entity.Subscribers, error)
 	FindByEmail(email string) ([]entity.Subscribers, error)
+	Insert(subscriber entity.Subscribers) error
+	UpdateById(subscriber entity.Subscribers) error
 }
 
 type SqlRepository struct {
@@ -99,4 +101,63 @@ func (repo *SqlRepository) FindByEmail(email string) ([]entity.Subscribers, erro
 		list = append(list, entity)
 	}
 	return list, nil
+}
+
+func (repo *SqlRepository) Insert(subscriber entity.Subscribers) error {
+	ctx := context.Background()
+	session, sessionErr := repo.Session.Conn(ctx)
+	if sessionErr != nil {
+		return sessionErr
+	}
+	defer session.Close()
+
+	sql := fmt.Sprintf(`
+	INSERT INTO %[1]s
+	(
+		%[2]s
+	)
+	VALUES
+	(
+		%[3]s
+	)
+	`,
+		repo.Collection,
+		sqlQuery.GenerateQueryColumnNames(entity.Subscribers{}, []string{"ID"}),
+		sqlQuery.GenerateQueryColumnValues(subscriber, []string{"ID"}),
+	)
+
+	_, err := session.ExecContext(ctx, sql)
+	if err != nil {
+		go repo.Logs.Error("", "subscriber_Repo_Insert", subscriber,
+			newsletterError.NewError(newsletterError.TechnicalError, err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+func (repo *SqlRepository) UpdateById(subscriber entity.Subscribers) error {
+
+	ctx := context.Background()
+	session, sessionErr := repo.Session.Conn(ctx)
+	if sessionErr != nil {
+		return sessionErr
+	}
+	defer session.Close()
+
+	sql := fmt.Sprintf(`
+	UPDATE %[1]s
+	SET 
+		%[2]s
+	WHERE ID = %[3]d
+	`,
+		repo.Collection,
+		sqlQuery.GenerateQueryUpdateFields(subscriber, []string{"ID"}),
+		subscriber.ID,
+	)
+	_, err := session.ExecContext(ctx, sql)
+	if err != nil {
+		return err
+	}
+	return nil
 }

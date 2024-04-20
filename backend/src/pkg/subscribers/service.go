@@ -9,6 +9,9 @@ import (
 
 type UseCase interface {
 	GetAllSubscribers() ([]entity.Subscribers, *newsletterError.ErrorCode)
+	FindByEmail(email string) ([]entity.Subscribers, *newsletterError.ErrorCode)
+	Insert(subscriber entity.Subscribers) *newsletterError.ErrorCode
+	UpdateById(subscriber entity.Subscribers) *newsletterError.ErrorCode
 }
 
 type Service struct {
@@ -33,7 +36,7 @@ func (service *Service) GetAllSubscribers() ([]entity.Subscribers, *newsletterEr
 		return nil, convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
-	if res == nil {
+	if len(res) == 0 {
 		return nil, convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
 	}
 
@@ -47,9 +50,29 @@ func (service *Service) FindByEmail(email string) ([]entity.Subscribers, *newsle
 		return nil, convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
-	if res == nil || len(res) == 0 {
+	if len(res) == 0 {
 		return nil, convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
 	}
 
 	return res, nil
+}
+
+func (service *Service) Insert(subscriber entity.Subscribers) *newsletterError.ErrorCode {
+	err := service.Repo.Insert(subscriber)
+
+	if err != nil {
+		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+	}
+
+	return nil
+}
+
+func (service *Service) UpdateById(subscriber entity.Subscribers) *newsletterError.ErrorCode {
+	err := service.Repo.UpdateById(subscriber)
+
+	if err != nil {
+		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+	}
+
+	return nil
 }

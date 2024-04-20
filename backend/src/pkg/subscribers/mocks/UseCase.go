@@ -14,6 +14,34 @@ type UseCase struct {
 	mock.Mock
 }
 
+// FindByEmail provides a mock function with given fields: email
+func (_m *UseCase) FindByEmail(email string) ([]entity.Subscribers, *error.ErrorCode) {
+	ret := _m.Called(email)
+
+	var r0 []entity.Subscribers
+	var r1 *error.ErrorCode
+	if rf, ok := ret.Get(0).(func(string) ([]entity.Subscribers, *error.ErrorCode)); ok {
+		return rf(email)
+	}
+	if rf, ok := ret.Get(0).(func(string) []entity.Subscribers); ok {
+		r0 = rf(email)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]entity.Subscribers)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string) *error.ErrorCode); ok {
+		r1 = rf(email)
+	} else {
+		if ret.Get(1) != nil {
+			r1 = ret.Get(1).(*error.ErrorCode)
+		}
+	}
+
+	return r0, r1
+}
+
 // GetAllSubscribers provides a mock function with given fields:
 func (_m *UseCase) GetAllSubscribers() ([]entity.Subscribers, *error.ErrorCode) {
 	ret := _m.Called()
@@ -40,6 +68,38 @@ func (_m *UseCase) GetAllSubscribers() ([]entity.Subscribers, *error.ErrorCode) 
 	}
 
 	return r0, r1
+}
+
+// Insert provides a mock function with given fields: subscriber
+func (_m *UseCase) Insert(subscriber entity.Subscribers) *error.ErrorCode {
+	ret := _m.Called(subscriber)
+
+	var r0 *error.ErrorCode
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) *error.ErrorCode); ok {
+		r0 = rf(subscriber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*error.ErrorCode)
+		}
+	}
+
+	return r0
+}
+
+// UpdateById provides a mock function with given fields: subscriber
+func (_m *UseCase) UpdateById(subscriber entity.Subscribers) *error.ErrorCode {
+	ret := _m.Called(subscriber)
+
+	var r0 *error.ErrorCode
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) *error.ErrorCode); ok {
+		r0 = rf(subscriber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*error.ErrorCode)
+		}
+	}
+
+	return r0
 }
 
 // NewUseCase creates a new instance of UseCase. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

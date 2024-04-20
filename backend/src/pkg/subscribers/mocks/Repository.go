@@ -65,6 +65,34 @@ func (_m *Repository) GetAllSubscribers() ([]entity.Subscribers, error) {
 	return r0, r1
 }
 
+// Insert provides a mock function with given fields: subscriber
+func (_m *Repository) Insert(subscriber entity.Subscribers) error {
+	ret := _m.Called(subscriber)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) error); ok {
+		r0 = rf(subscriber)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// UpdateById provides a mock function with given fields: subscriber
+func (_m *Repository) UpdateById(subscriber entity.Subscribers) error {
+	ret := _m.Called(subscriber)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) error); ok {
+		r0 = rf(subscriber)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // NewRepository creates a new instance of Repository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewRepository(t interface {
