@@ -17,7 +17,7 @@ type Repository interface {
 	GetAllSubscribers() ([]entity.Subscribers, error)
 	FindByEmail(email string) ([]entity.Subscribers, error)
 	Insert(subscriber entity.Subscribers) error
-	UpdateById(subscriber entity.Subscribers) error
+	UpdateByEmail(subscriber entity.Subscribers) error
 }
 
 type SqlRepository struct {
@@ -114,16 +114,22 @@ func (repo *SqlRepository) Insert(subscriber entity.Subscribers) error {
 	sql := fmt.Sprintf(`
 	INSERT INTO %[1]s
 	(
-		%[2]s
+		%[2]s,
+		[IsSubscribed],
+		[SubscribedDate],
+		[Delflag]
 	)
 	VALUES
 	(
-		%[3]s
+		%[3]s,
+		1,
+		GETDATE(),
+		0
 	)
 	`,
 		repo.Collection,
-		sqlQuery.GenerateQueryColumnNames(entity.Subscribers{}, []string{"ID"}),
-		sqlQuery.GenerateQueryColumnValues(subscriber, []string{"ID"}),
+		sqlQuery.GenerateQueryColumnNames(entity.Subscribers{}, []string{"ID", "IsSubscribed", "SubscribedDate", "Delflag"}),
+		sqlQuery.GenerateQueryColumnValues(subscriber, []string{"ID", "IsSubscribed", "SubscribedDate", "Delflag"}),
 	)
 
 	_, err := session.ExecContext(ctx, sql)
@@ -136,7 +142,7 @@ func (repo *SqlRepository) Insert(subscriber entity.Subscribers) error {
 	return nil
 }
 
-func (repo *SqlRepository) UpdateById(subscriber entity.Subscribers) error {
+func (repo *SqlRepository) UpdateByEmail(subscriber entity.Subscribers) error {
 
 	ctx := context.Background()
 	session, sessionErr := repo.Session.Conn(ctx)
@@ -145,15 +151,25 @@ func (repo *SqlRepository) UpdateById(subscriber entity.Subscribers) error {
 	}
 	defer session.Close()
 
+	setDate := `IsSubscribed = 1,
+	SubscribedDate = GETDATE()`
+
+	if !subscriber.IsSubscribed {
+		setDate = `IsSubscribed = 0,
+		UnsubscribedDate = GETDATE()`
+	}
+
 	sql := fmt.Sprintf(`
 	UPDATE %[1]s
 	SET 
-		%[2]s
-	WHERE ID = %[3]d
+		%[2]s,
+		%[4]s
+	WHERE Email = N'%[3]s'
 	`,
 		repo.Collection,
-		sqlQuery.GenerateQueryUpdateFields(subscriber, []string{"ID"}),
-		subscriber.ID,
+		sqlQuery.GenerateQueryUpdateFields(subscriber, []string{"ID", "SubscribedDate", "UnsubscribedDate", "IsSubscribed"}),
+		subscriber.Email,
+		setDate,
 	)
 	_, err := session.ExecContext(ctx, sql)
 	if err != nil {

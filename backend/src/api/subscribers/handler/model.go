@@ -9,3 +9,7 @@ type HandlerParam struct {
 	Service subscribers.UseCase
 	Logs    logger.Logger
 }
+
+type ResponseSucess struct {
+	Body string `json:"body"`
+}

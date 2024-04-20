@@ -86,8 +86,40 @@ func (_m *UseCase) Insert(subscriber entity.Subscribers) *error.ErrorCode {
 	return r0
 }
 
-// UpdateById provides a mock function with given fields: subscriber
-func (_m *UseCase) UpdateById(subscriber entity.Subscribers) *error.ErrorCode {
+// Subscribe provides a mock function with given fields: subscriber
+func (_m *UseCase) Subscribe(subscriber entity.Subscribers) *error.ErrorCode {
+	ret := _m.Called(subscriber)
+
+	var r0 *error.ErrorCode
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) *error.ErrorCode); ok {
+		r0 = rf(subscriber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*error.ErrorCode)
+		}
+	}
+
+	return r0
+}
+
+// Unsubscribe provides a mock function with given fields: subscriber
+func (_m *UseCase) Unsubscribe(subscriber entity.Subscribers) *error.ErrorCode {
+	ret := _m.Called(subscriber)
+
+	var r0 *error.ErrorCode
+	if rf, ok := ret.Get(0).(func(entity.Subscribers) *error.ErrorCode); ok {
+		r0 = rf(subscriber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*error.ErrorCode)
+		}
+	}
+
+	return r0
+}
+
+// UpdateByEmail provides a mock function with given fields: subscriber
+func (_m *UseCase) UpdateByEmail(subscriber entity.Subscribers) *error.ErrorCode {
 	ret := _m.Called(subscriber)
 
 	var r0 *error.ErrorCode

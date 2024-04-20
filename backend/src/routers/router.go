@@ -55,6 +55,8 @@ func InitRouter(routerConfig RouterConfig) http.Handler {
 
 	subscribers := router.PathPrefix("/subscribers").Subrouter()
 	subscribers.HandleFunc("", http.HandlerFunc(subscribersHandler.GetAllSubscribers)).Methods("GET")
+	subscribers.HandleFunc("/subscriber", http.HandlerFunc(subscribersHandler.Subscribe)).Methods("POST")
+	subscribers.HandleFunc("/unsubscriber", http.HandlerFunc(subscribersHandler.Unsubscribe)).Methods("POST")
 
 	return router
 }

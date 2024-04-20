@@ -79,8 +79,8 @@ func (_m *Repository) Insert(subscriber entity.Subscribers) error {
 	return r0
 }
 
-// UpdateById provides a mock function with given fields: subscriber
-func (_m *Repository) UpdateById(subscriber entity.Subscribers) error {
+// UpdateByEmail provides a mock function with given fields: subscriber
+func (_m *Repository) UpdateByEmail(subscriber entity.Subscribers) error {
 	ret := _m.Called(subscriber)
 
 	var r0 error

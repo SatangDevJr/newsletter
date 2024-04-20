@@ -11,7 +11,9 @@ type UseCase interface {
 	GetAllSubscribers() ([]entity.Subscribers, *newsletterError.ErrorCode)
 	FindByEmail(email string) ([]entity.Subscribers, *newsletterError.ErrorCode)
 	Insert(subscriber entity.Subscribers) *newsletterError.ErrorCode
-	UpdateById(subscriber entity.Subscribers) *newsletterError.ErrorCode
+	UpdateByEmail(subscriber entity.Subscribers) *newsletterError.ErrorCode
+	Subscribe(subscriber entity.Subscribers) *newsletterError.ErrorCode
+	Unsubscribe(subscriber entity.Subscribers) *newsletterError.ErrorCode
 }
 
 type Service struct {
@@ -67,11 +69,64 @@ func (service *Service) Insert(subscriber entity.Subscribers) *newsletterError.E
 	return nil
 }
 
-func (service *Service) UpdateById(subscriber entity.Subscribers) *newsletterError.ErrorCode {
-	err := service.Repo.UpdateById(subscriber)
+func (service *Service) UpdateByEmail(subscriber entity.Subscribers) *newsletterError.ErrorCode {
+	err := service.Repo.UpdateByEmail(subscriber)
 
 	if err != nil {
 		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+	}
+
+	return nil
+}
+
+func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterError.ErrorCode {
+
+	resSubscribe, err := service.UseCase.FindByEmail(subscriber.Email)
+	if err != nil {
+		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+	}
+
+	if len(resSubscribe) == 0 {
+		newSubscribe := entity.Subscribers{
+			Email: subscriber.Email,
+			Name:  subscriber.Name,
+		}
+
+		errInsert := service.UseCase.Insert(newSubscribe)
+		if errInsert != nil {
+			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		}
+
+	} else {
+		subscriber.IsSubscribed = true
+		errInsert := service.UseCase.UpdateByEmail(subscriber)
+		if errInsert != nil {
+			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		}
+	}
+
+	return nil
+}
+
+func (service *Service) Unsubscribe(subscriber entity.Subscribers) *newsletterError.ErrorCode {
+
+	resSubscribe, err := service.UseCase.FindByEmail(subscriber.Email)
+	if err != nil {
+		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+	}
+
+	if len(resSubscribe) == 0 {
+		return convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
+	} else {
+		newSubscribe := entity.Subscribers{
+			Email:        subscriber.Email,
+			Name:         subscriber.Name,
+			IsSubscribed: false,
+		}
+		errInsert := service.UseCase.UpdateByEmail(newSubscribe)
+		if errInsert != nil {
+			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		}
 	}
 
 	return nil

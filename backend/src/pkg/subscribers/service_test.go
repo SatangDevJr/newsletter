@@ -24,7 +24,7 @@ var (
 	mockRepoGetAllSubscribers *mocker.MockCall
 	mockRepoFindByEmail       *mocker.MockCall
 	mockRepoInsert            *mocker.MockCall
-	mockRepoUpdateById        *mocker.MockCall
+	mockRepoUpdateByEmail     *mocker.MockCall
 )
 
 func callRepoGetAllSubscribers() *mock.Call {
@@ -39,8 +39,8 @@ func callRepoInsert() *mock.Call {
 	return repository.On("Insert", mock.Anything)
 }
 
-func callRepoUpdateById() *mock.Call {
-	return repository.On("UpdateById", mock.Anything)
+func callRepoUpdateByEmail() *mock.Call {
+	return repository.On("UpdateByEmail", mock.Anything)
 }
 
 func beforeEach() {
@@ -236,48 +236,48 @@ func TestService_Insert(t *testing.T) {
 	})
 }
 
-func TestService_UpdateById(t *testing.T) {
-	beforeEachUpdateById := func() {
+func TestService_UpdateByEmail(t *testing.T) {
+	beforeEachUpdateByEmail := func() {
 		beforeEach()
 
-		mockRepoUpdateById = mocker.NewMockCall(callRepoUpdateById)
-		mockRepoUpdateById.Return(nil)
+		mockRepoUpdateByEmail = mocker.NewMockCall(callRepoUpdateByEmail)
+		mockRepoUpdateByEmail.Return(nil)
 	}
 
 	t.Run("should call repository update by id when call service update by id", func(t *testing.T) {
-		beforeEachUpdateById()
+		beforeEachUpdateByEmail()
 		mockSubscribers := entity.Subscribers{
 			Name:  "test",
 			Email: "ajistestmail@gmail.com",
 		}
 
-		service.UpdateById(mockSubscribers)
+		service.UpdateByEmail(mockSubscribers)
 
-		repository.AssertCalled(t, "UpdateById", mockSubscribers)
+		repository.AssertCalled(t, "UpdateByEmail", mockSubscribers)
 	})
 
 	t.Run("should return internal server error when call repository update by id failed", func(t *testing.T) {
-		beforeEachUpdateById()
+		beforeEachUpdateByEmail()
 		mockSubscribers := entity.Subscribers{
 			Name:  "test",
 			Email: "ajistestmail@gmail.com",
 		}
-		mockRepoUpdateById.Return(errors.New("Error"))
+		mockRepoUpdateByEmail.Return(errors.New("Error"))
 
-		err := service.UpdateById(mockSubscribers)
+		err := service.UpdateByEmail(mockSubscribers)
 
 		expectedError := convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 		assert.Equal(t, expectedError, err)
 	})
 
 	t.Run("should return error nil when call repository update by id success", func(t *testing.T) {
-		beforeEachUpdateById()
+		beforeEachUpdateByEmail()
 		mockSubscribers := entity.Subscribers{
 			Name:  "test",
 			Email: "ajistestmail@gmail.com",
 		}
 
-		err := service.UpdateById(mockSubscribers)
+		err := service.UpdateByEmail(mockSubscribers)
 
 		assert.Nil(t, err)
 	})
