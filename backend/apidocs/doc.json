@@ -1,0 +1,111 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Newsletter API",
+        "description": "Newsletter Service",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "API Support",
+            "email": "ritteejirapong@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "security": [{
+        "bearerAuth": []
+    }],
+    "servers": [{
+        "url": "http://localhost:8000"
+    }],
+    "paths": {},
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "schemas": {
+            "ResponseError": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "INTERNAL_SERVER_ERROR"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Internal server error"
+                    }
+                }
+            },
+            "ResponseConflict": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "CONFLICT"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Conflict"
+                    }
+                }
+            },
+            "ResponseBadRequest": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "BAD_REQUEST"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Bad Request"
+                    }
+                }
+            },
+            "ResponseDataNotFound": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "example": "DATA_NOT_FOUND"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Data not found"
+                    }
+                }
+            },
+            "ResultMessage": {
+                "type": "object",
+                "properties": {
+                    "resultstatus": {
+                        "type": "string"
+                    },
+                    "resultcode": {
+                        "type": "string"
+                    },
+                    "resultmsg": {
+                        "type": "string"
+                    },
+                    "resulttext": {
+                        "type": "string"
+                    },
+                    "resultid": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "resultremark": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
