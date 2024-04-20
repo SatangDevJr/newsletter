@@ -6,6 +6,7 @@ require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/gorilla/mux v1.8.0
+	github.com/kisielk/sqlstruct v0.0.0-20210630145711-dae28ed37023
 	github.com/olivere/elastic/v7 v7.0.32
 	github.com/stretchr/testify v1.8.1
 	github.com/swaggo/http-swagger v1.3.3

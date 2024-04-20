@@ -17,16 +17,16 @@ services:
     environment:
       - APP_PORT=8000
       - APP_VERSION=local
-      - DB_NAME=exam2022
+      - DB_NAME=subscribeproject
       - DB_USERNAME=sa
       - DB_PASSWORD=Sa1angXD
-      - DB_HOST=10.116.17.130
+      - DB_HOST=10.116.17.149
       - DB_PORT=1433
       - STAGE=dev
-      - ELS_URL=http://10.116.17.130:9200
+      - ELS_URL=http://10.116.17.149:9200
       - ELS_USERNAME=elastic
       - ELS_PASSWORD=changeme
-      - ELS_INDEX=test-login
+      - ELS_INDEX=test-subscribe
     volumes:
       - ./src:/go/src/app/src
       - ./apidocs:/go/src/app/apidocs

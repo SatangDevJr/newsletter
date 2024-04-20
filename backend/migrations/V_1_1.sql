@@ -11,7 +11,7 @@ CREATE TABLE [dbo].[TB_TRN_Subscribers](
 	[Name] [nvarchar](255) NOT NULL,
 	[IsSubscribed] [bit] NOT NULL,
     [SubscribedDate] [datetime] NOT NULL,
-    [UnsubscribedDate] [datetime] NOT NULL,
+    [UnsubscribedDate] [datetime] NULL,
 	[Delflag] [bit] NOT NULL,
  CONSTRAINT [PK_TB_TRN_Subscribers] PRIMARY KEY CLUSTERED 
 (

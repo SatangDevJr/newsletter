@@ -9,7 +9,10 @@ import (
 
 	"newsletter/src/cmd/config"
 
+	subscribers "newsletter/src/pkg/subscribers"
 	"newsletter/src/pkg/utils/logger"
+
+	subscribersHandler "newsletter/src/api/subscribers/handler"
 
 	"github.com/gorilla/mux"
 
@@ -31,10 +34,17 @@ func InitRouter(routerConfig RouterConfig) http.Handler {
 	fmt.Println("InitRouter :", routerConfig)
 
 	/* Repository */
+	subscribersRepository := subscribers.NewRepository("TB_TRN_Subscribers", routerConfig.DB, routerConfig.Logs)
 
 	/* Service */
+	subscribersService := subscribers.NewService(subscribersRepository, routerConfig.Logs)
 
 	/* Handler */
+	subscribersHandlerParam := subscribersHandler.HandlerParam{
+		Service: subscribersService,
+		Logs:    routerConfig.Logs,
+	}
+	subscribersHandler := subscribersHandler.MakeSubscribersHandler(subscribersHandlerParam)
 
 	/* Router */
 	middleware := middleware.NewMiddleware(routerConfig.Logs)
@@ -42,6 +52,9 @@ func InitRouter(routerConfig RouterConfig) http.Handler {
 	router.Use(middleware.Recover)
 	router.HandleFunc("/version", versionHandler)
 	router.PathPrefix("/swagger").Handler(httpSwagger.WrapHandler)
+
+	subscribers := router.PathPrefix("/subscribers").Subrouter()
+	subscribers.HandleFunc("", http.HandlerFunc(subscribersHandler.GetAllSubscribers)).Methods("GET")
 
 	return router
 }
