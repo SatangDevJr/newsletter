@@ -1,6 +1,7 @@
 package subscribers
 
 import (
+	"fmt"
 	"newsletter/src/pkg/entity"
 	"newsletter/src/pkg/utils/convert"
 	newsletterError "newsletter/src/pkg/utils/error"
@@ -38,7 +39,7 @@ func (service *Service) GetAllSubscribers() ([]entity.Subscribers, *newsletterEr
 		return nil, convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
-	if len(res) == 0 {
+	if res == nil {
 		return nil, convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
 	}
 
@@ -52,7 +53,7 @@ func (service *Service) FindByEmail(email string) ([]entity.Subscribers, *newsle
 		return nil, convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
-	if len(res) == 0 {
+	if res == nil {
 		return nil, convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
 	}
 
@@ -83,13 +84,15 @@ func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterErro
 
 	resSubscribe, err := service.UseCase.FindByEmail(subscriber.Email)
 	if err != nil {
+		fmt.Println("err : ", err)
 		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
 	if len(resSubscribe) == 0 {
 		newSubscribe := entity.Subscribers{
-			Email: subscriber.Email,
-			Name:  subscriber.Name,
+			Email:        subscriber.Email,
+			Name:         subscriber.Name,
+			IsSubscribed: true,
 		}
 
 		errInsert := service.UseCase.Insert(newSubscribe)
@@ -99,6 +102,7 @@ func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterErro
 
 	} else {
 		subscriber.IsSubscribed = true
+		fmt.Println("Im in else resSubscribe : ", subscriber)
 		errInsert := service.UseCase.UpdateByEmail(subscriber)
 		if errInsert != nil {
 			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)

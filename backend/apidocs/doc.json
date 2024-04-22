@@ -26,7 +26,7 @@
                 "tags": [
                     "Subscribers"
                 ],
-                "summary": "Subscribers",
+                "summary": "Get Subscribers",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -73,6 +73,146 @@
                     }
                 }
             }
+        },
+        "/subscribers/subscribe": {
+            "post": {
+                "tags": [
+                    "Subscribers"
+                ],
+                "summary": "Subscriber Member",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "test@gmail.com"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "test"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSuccess"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseBadRequest"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Data Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseDataNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/subscribers/unsubscribe": {
+            "post": {
+                "tags": [
+                    "Subscribers"
+                ],
+                "summary": "Unsubscriber Member",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "test@gmail.com"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "test"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseSuccess"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseBadRequest"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Data Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseDataNotFound"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResponseError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -84,6 +224,15 @@
             }
         },
         "schemas": {
+            "ResponseSuccess": {
+                "type": "object",
+                "properties": {
+                    "body": {
+                        "type": "string",
+                        "example": "subscribe success"
+                    }
+                }
+            },
             "ResponseError": {
                 "type": "object",
                 "properties": {

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	requestHeader "newsletter/src/api/requestheader"
 	"newsletter/src/pkg/entity"
@@ -57,7 +58,7 @@ func (handler *SubscribersHandler) Subscribe(response http.ResponseWriter, reque
 		json.NewEncoder(response).Encode(&errMsg)
 		return
 	}
-
+	fmt.Println("body : ", body)
 	err := handler.Service.Subscribe(body)
 	if err != nil {
 		switch *err {
