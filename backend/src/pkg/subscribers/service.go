@@ -1,7 +1,6 @@
 package subscribers
 
 import (
-	"fmt"
 	"newsletter/src/pkg/entity"
 	"newsletter/src/pkg/utils/convert"
 	newsletterError "newsletter/src/pkg/utils/error"
@@ -84,7 +83,6 @@ func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterErro
 
 	resSubscribe, err := service.UseCase.FindByEmail(subscriber.Email)
 	if err != nil {
-		fmt.Println("err : ", err)
 		return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 	}
 
@@ -102,8 +100,8 @@ func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterErro
 
 	} else {
 		subscriber.IsSubscribed = true
-		errInsert := service.UseCase.UpdateByEmail(subscriber)
-		if errInsert != nil {
+		errUpdate := service.UseCase.UpdateByEmail(subscriber)
+		if errUpdate != nil {
 			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
 		}
 	}
