@@ -438,6 +438,112 @@ func TestService_Subscribe(t *testing.T) {
 	})
 }
 
+func TestService_Unsubscribe(t *testing.T) {
+	beforeEachSubscribe := func() {
+		beforeEach()
+
+		mockServiceFindByEmail = mocker.NewMockCall(callServiceFindByEmail)
+		mockServiceFindByEmail.Return(nil, nil)
+		mockServiceUpdateByEmail = mocker.NewMockCall(callServiceUpdateByEmail)
+		mockServiceUpdateByEmail.Return(nil)
+	}
+
+	t.Run("should call service unsubscribe when call service find by email", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+
+		service.Unsubscribe(mockSubscribers)
+
+		mockUseCase.AssertCalled(t, "FindByEmail", mockSubscribers.Email)
+	})
+
+	t.Run("should return internal server error when call service find by email failed", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+		mockServiceFindByEmail.Return(nil, convert.ValueToErrorCodePointer(newsletterError.InternalServerError))
+
+		err := service.Unsubscribe(mockSubscribers)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		assert.Equal(t, expectedError, err)
+	})
+
+	t.Run("should return internal server error when call service find by email and response not exist data", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+		mockServiceFindByEmail.Return([]entity.Subscribers{}, nil)
+
+		err := service.Unsubscribe(mockSubscribers)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.DataNotFound)
+		assert.Equal(t, expectedError, err)
+	})
+
+	t.Run("in case response exist data should call service subscribe when call service update by email", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+
+		mockDataSubscribers := mockDataSubscribers()
+
+		mockServiceFindByEmail.Return(mockDataSubscribers, nil)
+
+		service.Unsubscribe(mockSubscribers)
+
+		newSubscribe := entity.Subscribers{
+			Email:        mockSubscribers.Email,
+			Name:         mockSubscribers.Name,
+			IsSubscribed: false,
+		}
+
+		mockUseCase.AssertCalled(t, "UpdateByEmail", newSubscribe)
+	})
+
+	t.Run("should return internal server error when call service update by email failed", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+
+		mockDataSubscribers := mockDataSubscribers()
+		mockServiceFindByEmail.Return(mockDataSubscribers, nil)
+		mockServiceUpdateByEmail.Return(convert.ValueToErrorCodePointer(newsletterError.InternalServerError))
+
+		err := service.Unsubscribe(mockSubscribers)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		assert.Equal(t, expectedError, err)
+	})
+
+	t.Run("should return error nil when call unsubscribe service update by email success", func(t *testing.T) {
+		beforeEachSubscribe()
+		mockSubscribers := entity.Subscribers{
+			Name:  "test",
+			Email: "ajistestmail@gmail.com",
+		}
+		mockDataSubscribers := mockDataSubscribers()
+		mockServiceFindByEmail.Return(mockDataSubscribers, nil)
+		mockServiceUpdateByEmail.Return(convert.ValueToErrorCodePointer(newsletterError.InternalServerError))
+
+		err := service.Unsubscribe(mockSubscribers)
+
+		expectedError := convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
+		assert.Equal(t, expectedError, err)
+	})
+}
+
 func mockDataSubscribers() []entity.Subscribers {
 	return []entity.Subscribers{
 		{
