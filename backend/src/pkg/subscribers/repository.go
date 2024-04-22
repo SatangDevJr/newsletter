@@ -174,8 +174,6 @@ func (repo *SqlRepository) UpdateByEmail(subscriber entity.Subscribers) error {
 		setDate,
 	)
 
-	fmt.Println("sql : ", sql)
-
 	_, err := session.ExecContext(ctx, sql)
 	if err != nil {
 		return err

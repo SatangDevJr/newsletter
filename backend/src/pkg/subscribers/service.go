@@ -102,7 +102,6 @@ func (service *Service) Subscribe(subscriber entity.Subscribers) *newsletterErro
 
 	} else {
 		subscriber.IsSubscribed = true
-		fmt.Println("Im in else resSubscribe : ", subscriber)
 		errInsert := service.UseCase.UpdateByEmail(subscriber)
 		if errInsert != nil {
 			return convert.ValueToErrorCodePointer(newsletterError.InternalServerError)
