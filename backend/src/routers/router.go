@@ -31,7 +31,6 @@ type RouterConfig struct {
 }
 
 func InitRouter(routerConfig RouterConfig) http.Handler {
-	fmt.Println("InitRouter :", routerConfig)
 
 	/* Repository */
 	subscribersRepository := subscribers.NewRepository("TB_TRN_Subscribers", routerConfig.DB, routerConfig.Logs)

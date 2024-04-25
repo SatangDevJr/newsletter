@@ -59,7 +59,7 @@ func (service *Service) SentEmail() *subscribetoolError.ErrorCode {
 	for _, value := range resGetAllSubscribers {
 
 		emailTarget := []string{value.Email}
-
+		fmt.Println("emailTarget : ", emailTarget)
 		mailInfo := email.SentMailContent{
 			To:      emailTarget,
 			Supject: "Test sent mail for subscribers",

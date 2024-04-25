@@ -1,55 +1,30 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"database/sql"
-	"strconv"
+	"net/url"
 	configs "subscribetool/src/cmd/config"
 	"subscribetool/src/pkg/subscribers"
 	"subscribetool/src/pkg/utils/email"
 	"subscribetool/src/pkg/utils/logger"
 
-	// "subscribetool/src/cmd/config"
-	// "subscribetool/src/pkg/utils/logger"
-	// router "subscribetool/src/routers"
-	// "flag"
 	"fmt"
-	"log"
-	"net/http"
-	"net/url"
-	"os"
-	"os/signal"
-
-	// "strconv"
-	// "syscall"
-	"time"
-
-	// _ "subscribetool/src/routers/docs"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"gopkg.in/gomail.v2"
 )
 
-const (
-	defaultPort   = "8000"
-	defaultAppEnv = "LOCAL"
-)
-
 func main() {
 	config := configs.GetConfig()
-	fmt.Println("config : ", config)
 
-	dbPOrt, _ := strconv.Atoi(config.MSSQL.MssqlHost)
 	dbConnection, _ := connectDatabase(DBConnectURL{
 		UserName: config.MSSQL.MssqlUsername,
 		Password: config.MSSQL.MssqlPassword,
 		DBHost:   config.MSSQL.MssqlHost,
-		Port:     dbPOrt,
+		Port:     config.MSSQL.MssqlPort,
 		DbName:   config.MSSQL.MSsqlName,
 	})
-
-	emailServerPort, _ := strconv.Atoi(config.EmailServer.EmailSMTPTLSSkipVarify)
 
 	var emailServerTLSSkipVerify bool
 	if config.EmailServer.EmailSMTPTLSSkipVarify == "true" {
@@ -60,7 +35,7 @@ func main() {
 
 	dialerMailServer, _ := makeDialerMailServer(EmailSMTPConnect{
 		EmailSMTPHost:          config.EmailServer.EmailSMTPHost,
-		EmailSmtpPort:          emailServerPort,
+		EmailSmtpPort:          config.EmailServer.EmailSMTPPort,
 		EmailSMTPEmailSender:   config.EmailServer.EmailSMTPMailSender,
 		EmailSMTPPassword:      config.EmailServer.EmailSMTPPassword,
 		EmailSMTPTLSSkipVerify: emailServerTLSSkipVerify,
@@ -71,7 +46,7 @@ func main() {
 		UserName: config.Elastic.UserName,
 		Password: config.Elastic.Password,
 		Index:    config.Elastic.Index,
-		Stage:    "local",
+		Stage:    "dev",
 	})
 
 	if errLog != nil {
@@ -85,6 +60,7 @@ func main() {
 	subscribersRepository := subscribers.NewRepository("TB_TRN_Subscribers", dbConnection, logs)
 
 	// Service
+	email.FromEMailSender = config.EmailServer.EmailSMTPMailSender
 	utilsEmailService := email.NewService(dialerMailServer)
 	serviceParam := subscribers.ServiceParam{
 		UtilsEmailService: utilsEmailService,
@@ -97,51 +73,6 @@ func main() {
 	subscribersService.SentEmail()
 
 	fmt.Println("End of Process")
-}
-
-func getEnvString(env, fallback string) string {
-	result := os.Getenv(env)
-	if result == "" {
-		return fallback
-	}
-	return result
-}
-
-func httpServer(httpAddr string, router http.Handler) *http.Server {
-	return &http.Server{
-		Addr:    httpAddr,
-		Handler: router,
-	}
-}
-
-func startServer(server *http.Server) {
-	ch := make(chan error, 1)
-
-	go func() {
-		ch <- server.ListenAndServe()
-	}()
-
-	select {
-	case err := <-ch:
-		log.Fatal(err)
-	default:
-		log.Println("The service is ready to listen and serve.")
-	}
-}
-
-func forceShutdownAfter(server *http.Server, timeout time.Duration) {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	server.Shutdown(ctx)
-}
-
-func waitingForSignal(sig ...os.Signal) {
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, sig...)
-
-	s := <-stop
-	log.Println("Got signal ", s.String())
 }
 
 type DBConnectURL struct {
